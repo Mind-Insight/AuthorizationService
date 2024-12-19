@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserCreate(BaseModel):
@@ -11,6 +11,11 @@ class UserSchema(UserCreate):
 
     class Config:
         from_attributes = True
+
+
+class UserCreateSchema(BaseModel):
+    email: EmailStr
+    password: str = Field(min_length=8)
 
 
 class TokenInfo(BaseModel):
