@@ -2,15 +2,15 @@ from datetime import datetime, timedelta
 import bcrypt
 import jwt
 
-from core.config import auth_jwt
+from core.config import settings
 
 
 def encode_jwt(
     payload: dict,
-    private_key: str = auth_jwt.private_key_path.read_text(),
-    algorithm: str = auth_jwt.algorithm,
+    private_key: str = settings.jwt.private_key_path.read_text(),
+    algorithm: str = settings.jwt.algorithm,
     expire_time_delta: timedelta | None = None,
-    expire_minutes: int = auth_jwt.access_token_expire_minutes,
+    expire_minutes: int = settings.jwt.access_token_expire_minutes,
 ):
     to_encode = payload.copy()
     now = datetime.utcnow()
@@ -25,8 +25,8 @@ def encode_jwt(
 
 def decode_jwt(
     token: str | None,
-    public_key: str = auth_jwt.public_key_path.read_text(),
-    algorithm: str = auth_jwt.algorithm,
+    public_key: str = settings.jwt.public_key_path.read_text(),
+    algorithm: str = settings.jwt.algorithm,
 ):
     decoded = jwt.decode(token, public_key, algorithms=[algorithm])
     return decoded

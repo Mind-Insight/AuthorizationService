@@ -1,0 +1,54 @@
+@startuml project
+skinparam BackgroundColor #EAF3FF
+skinparam NodeBackgroundColor #2A6596
+skinparam NodeFontColor White
+skinparam PackageBackgroundColor #DDEFFF
+skinparam PackageBorderColor #2A6596
+skinparam ArrowColor #2A6596
+skinparam FontColor Black
+skinparam DefaultFontName "Arial"
+
+left to right direction
+
+package "System Overview" {
+    package "API Gateway" as api_pkg #DDEFFF {
+        rectangle "API Gateway" as api #326ce5
+    }
+
+    package "Authorization Service" as auth_service #DDEFFF {
+        rectangle "User Management" as user_management #5DADE2
+        rectangle "Social Login Handling" as social_handling #5DADE2
+    }
+
+    package "Infrastructure" as infra #DDEFFF {
+        rectangle "Rate Limiter" as rate_limiting #A3E4D7
+        rectangle "Redis Cache" as redis #F5B7B1
+        rectangle "PostgreSQL" as postgres #A9DFBF
+    }
+
+    package "External Services" as external #DDEFFF {
+        rectangle "Yandex OAuth" as yandex #F4D03F
+        rectangle "VK OAuth" as vk #85C1E9
+    }
+
+    package "Monitoring" as monitoring #DDEFFF {
+        rectangle "Jaeger" as jaeger #F39C12
+    }
+}
+
+api --> user_management : "User Operations"
+api --> social_handling : "Social Login"
+
+user_management --> rate_limiting : "Check Request Limit"
+user_management --> jaeger : "Trace Requests"
+user_management --> redis : "Manage User Sessions"
+user_management --> postgres : "Query/Update User Data"
+
+social_handling --> rate_limiting : "Check Request Limit"
+social_handling --> jaeger : "Trace Requests"
+social_handling --> redis : "Store Social Access Tokens"
+social_handling --> postgres : "Query User Data"
+social_handling --> yandex : "OAuth Authentication"
+social_handling --> vk : "OAuth Authentication"
+
+@enduml
