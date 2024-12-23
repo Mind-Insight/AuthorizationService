@@ -1,11 +1,18 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Text, String
 from db.database import Base
 
 
 class User(Base):
-    __table_args__ = {'extend_existing': True}
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
-    password = Column(String)
+    email: Mapped[str] = mapped_column(
+        String(100),
+        unique=True,
+        nullable=False,
+    )
+    password: Mapped[str] = mapped_column(
+        Text,
+        unique=False,
+        nullable=False,
+    )

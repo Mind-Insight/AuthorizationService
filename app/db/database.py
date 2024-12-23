@@ -2,12 +2,12 @@ from datetime import datetime, timezone
 import uuid
 
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import TIMESTAMP
+from sqlalchemy import TIMESTAMP, MetaData
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
     AsyncSession,
     AsyncAttrs,
-    async_sessionmaker
+    async_sessionmaker,
 )
 from sqlalchemy.orm import (
     DeclarativeBase,
@@ -16,20 +16,23 @@ from sqlalchemy.orm import (
     mapped_column,
 )
 
-
-from core.config import get_db_url
-
-
-DB_HOST = "localhost"
-DB_PORT = "5433"
-DB_NAME = "users"
-DB_USER = "postgres"
-DB_PASSWORD = "admin"
+from core.config import settings
 
 
-DATABASE_URL = get_db_url()
+DATABASE_URL = settings.get_db_url()
 engine = create_async_engine(DATABASE_URL)
 async_session = async_sessionmaker(bind=engine, expire_on_commit=False)
+
+convention = {
+    "all_column_names": lambda constraint, table: "_".join(
+        [column.name for column in constraint.columns.values()]
+    ),
+    "ix": "ix__%(table_name)s__%(all_column_names)s",
+    "uq": "uq__%(table_name)s__%(all_column_names)s",
+    "ck": "ck__%(table_name)s__%(constraint_name)s",
+    "fk": "fk__%(table_name)s__%(all_column_names)s__%(referred_table_name)s",
+    "pk": "pk__%(table_name)s",
+}
 
 
 class Base(AsyncAttrs, DeclarativeBase):
@@ -46,6 +49,8 @@ class Base(AsyncAttrs, DeclarativeBase):
         unique=True,
         nullable=False,
     )
+
+    metadata = MetaData(naming_convention=convention)
 
 
 class TimestampMixin:
