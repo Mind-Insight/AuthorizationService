@@ -1,11 +1,11 @@
 from datetime import datetime, timezone
+from typing import AsyncGenerator
 import uuid
 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import TIMESTAMP, MetaData
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
-    AsyncSession,
     AsyncAttrs,
     async_sessionmaker,
 )
@@ -50,7 +50,10 @@ class Base(AsyncAttrs, DeclarativeBase):
         nullable=False,
     )
 
-    metadata = MetaData(naming_convention=convention)
+    metadata = MetaData(
+        naming_convention=convention,
+        schema=settings.db_schema,
+    )
 
 
 class TimestampMixin:
@@ -67,9 +70,10 @@ class TimestampMixin:
     )
 
 
-async def get_db() -> AsyncSession:
+async def get_db() -> AsyncGenerator:
     async with async_session() as session:
         yield session
+        await session.close()
 
 
 async def create_tables():

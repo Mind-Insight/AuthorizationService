@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     DB_USER: str = Field(..., env="DB_USER")
     DB_PASSWORD: str = Field(..., env="DB_PASSWORD")
 
+    db_schema: str = "auth"
+
     class Config:
         env_file = os.path.join(BASE_DIR, ".env")
 
