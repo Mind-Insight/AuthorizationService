@@ -2,8 +2,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 import uvicorn
-from api import user_controller
-from api.auth import router as auth_router
+
+from api.user_controller import router
 from db.database import create_tables
 
 
@@ -18,8 +18,7 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
 )
 
-app.include_router(user_controller.router)
-app.include_router(auth_router)
+app.include_router(router)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", reload=True)

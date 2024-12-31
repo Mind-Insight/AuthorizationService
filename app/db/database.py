@@ -17,6 +17,7 @@ from sqlalchemy.orm import (
 )
 
 from core.config import settings
+from core.redis import redis_connection
 
 
 DATABASE_URL = settings.get_db_url()
@@ -74,6 +75,11 @@ async def get_db() -> AsyncGenerator:
     async with async_session() as session:
         yield session
         await session.close()
+
+
+async def get_redis() -> AsyncGenerator:
+    async with redis_connection as redis:
+        yield redis
 
 
 async def create_tables():

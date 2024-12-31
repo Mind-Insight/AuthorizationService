@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     DB_USER: str = Field(..., env="DB_USER")
     DB_PASSWORD: str = Field(..., env="DB_PASSWORD")
 
+    REDIS_HOST: str = Field(..., env="REDIS_HOST")
+    REDIS_PORT: str = Field(..., env="REDIS_PORT")
+
     db_schema: str = "auth"
 
     class Config:
