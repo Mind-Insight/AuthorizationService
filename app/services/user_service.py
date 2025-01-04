@@ -1,8 +1,7 @@
-from utils.jwt_utils import hash_password
+from fastapi import HTTPException, status
+from utils.jwt_utils import hash_password, validate_password
 from models.user import User
 from repositories.user_repository import UserRepository
-# from schemas.user import UserCreate
-# from fastapi import HTTPException, status
 
 
 class UserService:
@@ -10,14 +9,12 @@ class UserService:
         self.user_repository = user_repository
 
     async def register_user(self, user_data: dict) -> User:
-        # existing_user = await self.user_repository.get_user_by_email(
-        #     user.email
-        # )
-        # if existing_user:
-        #     raise HTTPException(
-        #         status_code=status.HTTP_400_BAD_REQUEST,
-        #         detail="Email is already registered",
-        #     )
         user_data = user_data.model_dump()
         user_data["password"] = hash_password(user_data["password"]).decode()
         return await self.user_repository.create_user(user_data)
+
+    async def validate_user(self, email: str, password: str):
+        user = await self.user_repository.get_user_by_email(email=email)
+        if user and validate_password(password, user.password):
+            return user
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)

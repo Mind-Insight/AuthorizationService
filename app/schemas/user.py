@@ -1,21 +1,11 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
-class UserCreate(BaseModel):
-    email: str
-    password: str
+class UserSchema(BaseModel):
+    model_config = ConfigDict(strict=True)
 
-
-class UserSchema(UserCreate):
-    id: int
-
-    class Config:
-        from_attributes = True
-
-
-class UserCreateSchema(BaseModel):
     email: EmailStr
-    password: str = Field(min_length=8)
+    password: bytes
 
 
 class TokenInfo(BaseModel):
