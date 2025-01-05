@@ -1,4 +1,4 @@
-from fastapi import Body, Depends, HTTPException, status
+from fastapi import Depends, Form, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -47,11 +47,11 @@ async def get_current_auth_user(
 
 
 async def validate_auth_user(
-    email: str = Body(..., embed=True),
-    password: str = Body(..., embed=True),
+    username: str = Form(...),
+    password: str = Form(...),
     user_service: UserService = Depends(get_user_service),
 ) -> UserSchema:
-    user = await user_service.validate_user(email=email, password=password)
+    user = await user_service.validate_user(email=username, password=password)
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     return user
