@@ -5,9 +5,14 @@ class UserSchema(BaseModel):
     model_config = ConfigDict(strict=True)
 
     email: EmailStr
-    password: bytes
+    password: str
 
 
 class TokenInfo(BaseModel):
     access_token: str
     token_type: str
+
+
+class UserResponse(BaseModel):
+    id: str
+    email: str

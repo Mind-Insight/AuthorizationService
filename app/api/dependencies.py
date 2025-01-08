@@ -3,6 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from models.user import User
 from services.user_service import UserService
 from repositories.user_repository import UserRepository
 from utils import jwt_utils
@@ -14,7 +15,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login/")
 
 
 def get_user_service(db: AsyncSession = Depends(get_db)):
-    user_repository = UserRepository(db)
+    user_repository = UserRepository(db, User)
     return UserService(user_repository)
 
 
@@ -36,7 +37,7 @@ async def get_current_auth_user(
     db: AsyncSession = Depends(get_db),
 ) -> UserSchema:
     email: str | None = payload.get("sub")
-    user_repository = UserRepository(db)
+    user_repository = UserRepository(db, User)
     user = await user_repository.get_user_by_email(email=email)
     if not user:
         raise HTTPException(
