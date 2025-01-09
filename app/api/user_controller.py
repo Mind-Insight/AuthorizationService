@@ -46,4 +46,9 @@ async def login_user(
 async def get_user_profile(
     user: UserSchema = Depends(get_current_auth_user),
 ):
-    return UserResponse(id=user.id, email=user.email)
+    return UserResponse(id=str(user.id), email=user.email)
+
+
+@router.patch("/me/")
+async def udpate_profile(user: UserSchema = Depends(get_current_auth_user)):
+    pass

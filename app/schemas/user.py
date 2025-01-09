@@ -6,6 +6,8 @@ class UserSchema(BaseModel):
 
     email: EmailStr
     password: str
+    is_active: bool
+    connected_accounts: dict[str, str] | None
 
 
 class TokenInfo(BaseModel):

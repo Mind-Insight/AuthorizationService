@@ -36,8 +36,8 @@ convention = {
 }
 
 
-class Base(AsyncAttrs, DeclarativeBase):
-    __abstract__ = True
+class Base(DeclarativeBase):
+    # __abstract__ = True
 
     @declared_attr.directive
     def __tablename__(cls) -> str:
@@ -55,6 +55,11 @@ class Base(AsyncAttrs, DeclarativeBase):
         naming_convention=convention,
         schema=settings.db_schema,
     )
+
+
+# from sqlalchemy.ext.declarative import declarative_base
+
+# Base = declarative_base()
 
 
 class TimestampMixin:
@@ -90,3 +95,7 @@ async def create_tables():
 async def delete_tables():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+
+
+async def close_connection():
+    await engine.dispose()

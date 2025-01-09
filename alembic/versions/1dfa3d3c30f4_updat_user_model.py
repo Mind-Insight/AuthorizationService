@@ -1,8 +1,8 @@
-"""init tables
+"""updat user model
 
-Revision ID: 0f70683ef71f
-Revises: c07f0be60db0
-Create Date: 2024-12-30 10:10:53.988186
+Revision ID: 1dfa3d3c30f4
+Revises: bcfd3c78cc83
+Create Date: 2025-01-09 21:58:01.333059
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '0f70683ef71f'
-down_revision: Union[str, None] = 'c07f0be60db0'
+revision: str = '1dfa3d3c30f4'
+down_revision: Union[str, None] = 'bcfd3c78cc83'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -23,7 +23,11 @@ def upgrade() -> None:
     op.create_table('users',
     sa.Column('email', sa.String(length=100), nullable=False),
     sa.Column('password', sa.Text(), nullable=False),
+    sa.Column('is_active', sa.Boolean(), nullable=False),
+    sa.Column('connected_accounts', sa.JSON(), nullable=True),
     sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('created_at', sa.TIMESTAMP(timezone=True), nullable=False),
+    sa.Column('updated_at', sa.TIMESTAMP(timezone=True), nullable=False),
     sa.PrimaryKeyConstraint('id', name=op.f('pk__users')),
     sa.UniqueConstraint('email', name=op.f('uq__users__email')),
     sa.UniqueConstraint('id', name=op.f('uq__users__id')),

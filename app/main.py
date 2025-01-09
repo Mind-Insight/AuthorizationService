@@ -4,13 +4,14 @@ from fastapi.responses import ORJSONResponse
 import uvicorn
 
 from api.user_controller import router
-from db.database import create_tables
+from db.database import create_tables, close_connection
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await create_tables()
     yield
+    await close_connection()
 
 
 app = FastAPI(
