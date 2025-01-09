@@ -18,3 +18,8 @@ class TokenInfo(BaseModel):
 class UserResponse(BaseModel):
     id: str
     email: str
+
+
+class ChangePassword(BaseModel):
+    current_password: str
+    new_password: str
