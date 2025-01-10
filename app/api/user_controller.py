@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -6,6 +6,7 @@ from api.dependencies import (
     get_current_auth_user,
     get_user_service,
     validate_auth_user,
+    oauth2_scheme,
 )
 from models.user import User
 from utils import jwt_utils
@@ -66,4 +67,18 @@ async def change_password(
         current_password=password_data.current_password,
         new_password=password_data.new_password,
     )
-    return {"message": "password changed successfully"}
+    return {"message": "Password changed successfully"}
+
+
+@router.post("/logout/")
+async def logout(
+    token: str = Depends(oauth2_scheme),
+    redis: Redis = Depends(database.get_redis),
+):
+    is_deleted = await redis.delete(token)
+    if not is_deleted:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Token not found or logged out",
+        )
+    return {"message": "successfully logged out"}

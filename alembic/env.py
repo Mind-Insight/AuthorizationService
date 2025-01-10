@@ -19,16 +19,12 @@ section = config.config_ini_section
 config.set_section_option(section, "DB_DSN", f"{settings.get_db_url()}")
 
 
-# def include_name(name, type_, parent_names):
-#     if type_ == "schema":
-#         # schemas = [None] + settings.db_schema
-#         return name == settings.db_schema
-#     else:
-#         return True
 def include_name(name, type_, parent_names):
-    if type_ == "auth":
-        return name in ["auth"]
-    return True
+    if type_ == "schema":
+        # schemas = [None] + settings.db_schema
+        return name == settings.db_schema
+    else:
+        return True
 
 
 # Interpret the config file for Python logging.

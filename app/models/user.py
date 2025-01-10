@@ -7,7 +7,7 @@ from db.database import Base, TimestampMixin
 
 
 class User(Base, TimestampMixin):
-    __tablename__ = "users"
+    # __tablename__ = "users"
     # id: Mapped[uuid.UUID] = mapped_column(
     #     UUID(as_uuid=True),
     #     primary_key=True,

@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Self
 import uuid
 
 from sqlalchemy.dialects.postgresql import UUID
@@ -37,10 +37,13 @@ convention = {
 
 
 class Base(DeclarativeBase):
-    # __abstract__ = True
+    __abstract__ = True
 
-    @declared_attr.directive
-    def __tablename__(cls) -> str:
+    @declared_attr
+    def __tablename__(cls) -> Self:
+        if f"{cls.__name__.lower()}"[-1] == "y":
+            new_name = f"{cls.__name__.lower()}"[:-1]
+            return f"{new_name}ies"
         return f"{cls.__name__.lower()}s"
 
     id: Mapped[uuid.UUID] = mapped_column(
