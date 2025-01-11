@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     REDIS_HOST: str = Field(..., env="REDIS_HOST")
     REDIS_PORT: str = Field(..., env="REDIS_PORT")
 
+    CLIENT_ID: str = Field(..., env="CLIENT_ID")
+    CLIENT_SECRET: str = Field(..., env="CLIENT_SECRET")
+
     db_schema: str = "auth"
 
     class Config:
