@@ -23,11 +23,15 @@ app = FastAPI(
 app.add_middleware(
     SessionMiddleware,
     secret_key="secret",
-    https_only=False
+    https_only=False,
+    same_site="lax",
+    session_cookie="session",
 )
+
 
 app.include_router(router)
 app.include_router(social_router)
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", reload=True)

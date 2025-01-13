@@ -11,6 +11,7 @@ class AuthJWT(BaseModel):
     public_key_path: Path = BASE_DIR / "certs" / "jwt-public.pem"
     algorithm: str = "RS256"
     access_token_expire_minutes: int = 30
+    yandex_token_expire_seconds: int = 10
 
 
 class Settings(BaseSettings):
@@ -25,6 +26,7 @@ class Settings(BaseSettings):
 
     CLIENT_ID: str = Field(..., env="CLIENT_ID")
     CLIENT_SECRET: str = Field(..., env="CLIENT_SECRET")
+    yandex_redirect_uri: str = "http://127.0.0.1:8000/social/callback/yandex"
 
     db_schema: str = "auth"
 
