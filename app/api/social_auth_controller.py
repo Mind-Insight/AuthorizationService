@@ -1,6 +1,6 @@
+import aiohttp
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
-from authlib.integrations.starlette_client import OAuthError
 from redis.asyncio import Redis
 
 from db.database import get_redis
@@ -35,12 +35,12 @@ async def callback_from_yandex(
     await redis.set(
         f"{user_email}:access_token",
         token.get("access_token"),
-        ex=settings.jwt.yandex_token_expire_seconds,
+        ex=settings.jwt.yandex_access_token_expire_seconds,
     )
     await redis.set(
         f"{user_email}:refresh_token",
         token.get("refresh_token"),
-        ex=settings.jwt.yandex_token_expire_seconds,
+        ex=settings.jwt.yandex_refresh_token_expire_second,
     )
     return RedirectResponse("http://127.0.0.1:8000/social/auth/me/")
 
@@ -59,38 +59,47 @@ async def get_current_user(
 
 
 @social_router.get("/auth/refresh")
-async def refresh_tokens(
-    request: Request,
-    redis: Redis = Depends(get_redis),
-):
-    email = request.session.get("user_email")
-    if not email:
+async def refresh_token(request: Request, redis: Redis = Depends(get_redis)):
+    user_email = request.session.get("user_email")
+    if not user_email:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    refresh_token = await redis.get(f"{email}:refresh_token")
+    refresh_token = await redis.get(f"{user_email}:refresh_token")
     if not refresh_token:
-        raise HTTPException(status_code=400, detail="Refresh token not found")
-
-    try:
-        token = await oauth.yandex.refresh_token(
-            url="https://oauth.yandex.ru/token",
-            refresh_token=refresh_token.decode("utf-8"),
-        )
-    except OAuthError as e:
         raise HTTPException(
-            status_code=400, detail=f"Token refresh failed: {str(e)}"
+            status_code=401,
+            detail="Refresh token not found",
         )
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+            settings.yandex_token_url,
+            data={
+                "grant_type": "refresh_token",
+                "refresh_token": refresh_token,
+                "client_id": settings.YANDEX_CLIENT_ID,
+                "client_secret": settings.YANDEX_CLIENT_SECRET,
+            },
+        ) as response:
+            if response.status != 200:
+                raise HTTPException(
+                    status_code=response.status,
+                    detail="Failed to refresh token",
+                )
+            new_token = await response.json()
 
     await redis.set(
-        f"{email}:access_token",
-        token.get("access_token"),
-        ex=settings.jwt.yandex_token_expire_seconds,
+        f"{user_email}:access_token",
+        new_token["access_token"],
+        ex=settings.jwt.yandex_access_token_expire_seconds,
     )
-    if "refresh_token" in token:
-        await redis.set(
-            f"{email}:refresh_token",
-            token.get("refresh_token"),
-            ex=settings.jwt.yandex_token_expire_seconds,
-        )
+    await redis.set(
+        f"{user_email}:refresh_token",
+        new_token["refresh_token"],
+        ex=settings.jwt.yandex_refresh_token_expire_second,
+    )
 
-    return {"access_token": token.get("access_token")}
+    return {
+        "message": "Token refreshed successfully",
+        "access_token": new_token["access_token"],
+    }
