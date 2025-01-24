@@ -14,9 +14,13 @@ from schemas.user import UserResponse, UserSchema, TokenInfo, ChangePassword
 from services.user_service import UserService
 from repositories.user_repository import UserRepository
 from db import database
+from fastapi_user_limiter.limiter import rate_limiter
 
-
-router = APIRouter(prefix="/users", tags=["Users"])
+router = APIRouter(
+    prefix="/users",
+    tags=["Users"],
+    dependencies=[Depends(rate_limiter(5, 5, path="/router"))],
+)
 
 
 @router.post("/register/")
@@ -49,7 +53,10 @@ async def login_user(
     return TokenInfo(access_token=token, token_type="Bearer")
 
 
-@router.get("/me/", response_model=UserResponse)
+@router.get(
+    "/me/",
+    response_model=UserResponse,
+)
 async def get_user_profile(
     user: UserSchema = Depends(get_current_auth_user),
 ):
