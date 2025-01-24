@@ -103,3 +103,15 @@ async def refresh_token(request: Request, redis: Redis = Depends(get_redis)):
         "message": "Token refreshed successfully",
         "access_token": new_token["access_token"],
     }
+
+
+@social_router.get("/auth/logout")
+async def logout_user(request: Request, redis: Redis = Depends(get_redis)):
+    user_email = request.session.get("user_email")
+    if not user_email:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    await redis.delete(f"{user_email}:access_token")
+    await redis.delete(f"{user_email}:refresh_token")
+    request.session.clear()
+    return {"message": "Successfully logged out"}
