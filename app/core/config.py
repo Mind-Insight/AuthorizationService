@@ -30,16 +30,17 @@ class Settings(BaseSettings):
     yandex_token_url: str = "https://oauth.yandex.ru/token"
     yandex_redirect_uri: str = "http://127.0.0.1:8000/social/callback/yandex"
 
+    GOOGLE_CLIENT_ID: str = Field(..., env="GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_SECRET: str = Field(..., env="GOOGLE_CLIENT_SECRET")
+    GOOGLE_REDIRECT_URI: str = Field(..., env="GOOGLE_REDIRECT_URI")
+    GOOGLE_TOKEN_URL: str = Field(..., env="GOOGLE_TOKEN_URL")
+
     db_schema: str = "auth"
 
     class Config:
         env_file = os.path.join(BASE_DIR, ".env")
 
     jwt: AuthJWT = AuthJWT()
-
-    # def __init__(self, **kwargs):
-    #     super().__init__(**kwargs)
-    #     self.pg_dsn = self.get_db_url()
 
     def get_db_url(self) -> str:
         return (

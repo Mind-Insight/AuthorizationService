@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,6 +8,7 @@ from api.dependencies import (
     validate_auth_user,
     oauth2_scheme,
 )
+from utils.helpers import detect_device
 from models.user import User
 from utils import jwt_utils
 from schemas.user import UserResponse, UserSchema, TokenInfo, ChangePassword
@@ -26,16 +27,23 @@ router = APIRouter(
 @router.post("/register/")
 async def register_user(
     user_data: UserSchema,
+    request: Request,
     db: AsyncSession = Depends(database.get_db),
 ):
     user_repository = UserRepository(db, User)
     user_service = UserService(user_repository)
+
+    if not user_data.device_type:
+        user_agent = request.headers.get("User-Agent")
+        user_data.device_type = detect_device(user_agent)
+
     user = await user_service.register_user(user_data)
-    # return UserResponse(id=user.id, email=user.email)
+
     return {
         "id": user.id,
         "email": user.email,
         "is_active": user.is_active,
+        "device_type": user.device_type
     }
 
 

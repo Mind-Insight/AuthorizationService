@@ -13,6 +13,11 @@ class UserService(BaseService[User]):
     async def register_user(self, user_data: dict) -> User:
         user_data = user_data.model_dump()
         user_data["password"] = hash_password(user_data["password"])
+        
+        # Проверяем, есть ли device_type, если нет - устанавливаем "unknown"
+        if "device_type" not in user_data:
+            user_data["device_type"] = "unknown"
+
         return await self.repository.create(user_data)
 
     async def change_password(

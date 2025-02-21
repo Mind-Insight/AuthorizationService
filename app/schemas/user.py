@@ -8,6 +8,7 @@ class UserSchema(BaseModel):
     password: str
     is_active: bool
     connected_accounts: dict[str, str] | None
+    device_type: str
 
 
 class TokenInfo(BaseModel):

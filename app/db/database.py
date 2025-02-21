@@ -3,10 +3,9 @@ from typing import AsyncGenerator, Self
 import uuid
 
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import TIMESTAMP, MetaData
+from sqlalchemy import TIMESTAMP, MetaData, text
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
-    AsyncAttrs,
     async_sessionmaker,
 )
 from sqlalchemy.orm import (
@@ -60,20 +59,15 @@ class Base(DeclarativeBase):
     )
 
 
-# from sqlalchemy.ext.declarative import declarative_base
-
-# Base = declarative_base()
-
-
 class TimestampMixin:
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True),
-        default=datetime.now(timezone.utc),
+        server_default=text("NOW()"),
         nullable=False,
     )
     updated_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True),
-        default=datetime.now(timezone.utc),
+        server_default=text("NOW()"),
         onupdate=datetime.now(timezone.utc),
         nullable=False,
     )

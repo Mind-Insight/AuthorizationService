@@ -7,6 +7,7 @@ import uvicorn
 
 from api.user_controller import router
 from api.social_auth_controller import social_router
+from api.google_auth_controller import google_router
 from db.database import create_tables, close_connection
 from core.trace_config import configure_tracer, RequestIdMiddleware
 
@@ -38,6 +39,7 @@ app.add_middleware(
 
 app.include_router(router)
 app.include_router(social_router)
+app.include_router(google_router)
 
 
 if __name__ == "__main__":
