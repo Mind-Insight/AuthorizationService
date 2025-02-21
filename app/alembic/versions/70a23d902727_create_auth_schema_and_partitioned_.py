@@ -40,7 +40,6 @@ def upgrade():
         """
     )
 
-    # Создаем партиции по device_type
     for device in ["phone", "tablet", "computer", "unknown"]:
         op.execute(
             f"""
@@ -49,8 +48,6 @@ def upgrade():
             PARTITION BY RANGE (age);
             """
         )
-
-    # Создаем под-партиции по возрасту
     age_ranges = [(0, 18, "young"), (18, 50, "adult"), (50, 150, "senior")]
 
     for device in ["phone", "tablet", "computer", "unknown"]:
@@ -64,7 +61,6 @@ def upgrade():
 
 
 def downgrade():
-    # Удаляем под-партиции по возрасту
     for device in ["phone", "tablet", "computer", "unknown"]:
         for _, _, label in [
             (0, 18, "young"),
@@ -72,8 +68,6 @@ def downgrade():
             (50, 150, "senior"),
         ]:
             op.execute(f"DROP TABLE IF EXISTS auth.users_{device}_{label}")
-
-    # Удаляем партиции по device_type
     for device in ["phone", "tablet", "computer", "unknown"]:
         op.execute(f"DROP TABLE IF EXISTS auth.users_{device}")
 
