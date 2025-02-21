@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import JSON, Boolean, Column, Text, String
+from sqlalchemy import JSON, Boolean, Column, Integer, Text, String
 
 from db.database import Base, TimestampMixin
 
@@ -14,3 +14,4 @@ class User(Base, TimestampMixin):
         JSON, nullable=True
     )
     device_type = Column(String, nullable=False)
+    age = Column(Integer, nullable=False)
